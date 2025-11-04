@@ -1,8 +1,22 @@
 import pytest
-from triangulator_app import app
+from triangulator_app import app, tri
 
 
-# REMEMBER => use monkeypatch pour fake les retours des methodes du PSM
+def verify_error_json_response(response):
+    """
+    Vérifie que la réponse JSON contient le code d'erreur et le message attendus.
+
+    Args:
+        response (flask.TestResponse): réponse renvoyée par le client de test.
+    Returns:
+        bool: True si le JSON contient `code` et `message`, False sinon.
+    """
+    expected_code = "TRIANGULATION_FAILED"
+    expected_message = "Triangulation could not be computed for the given point set."
+    json_data = response.get_json()
+    if json_data["code"] == expected_code and json_data["message"] == expected_message:
+        return True
+    return False
 
 @pytest.fixture
 def client():
@@ -15,16 +29,39 @@ def test_triangulation_success_binary(client, monkeypatch):
     assert True
 
 
-def test_invalid_uuid_returns_400(client):
+def test_invalid_uuid_returns_400(client, monkeypatch):
+    """
+    Teste que la route retourne un code 400 pour un UUID invalide.
+    Args:
+        client (flask.TestClient): client de test Flask.
+    Returns:
+        None
+    """
+    def fake_get_point_set():
+        raise Exception("incorrect uuid format")
+
+    monkeypatch.setattr(tri, "get_point_set", fake_get_point_set)
     response = client.get("/triangulation/***invalid-uuid***")
     assert response.status_code == 400
-    assert response.get_json() == {
-        "code": "TRIANGULATION_FAILED",
-        "message": "Triangulation could not be computed for the given point set."
-    }
+    assert verify_error_json_response(response)
 
 def test_pointset_not_found_returns_404(client, monkeypatch):
-    assert True
+    """
+    Teste que la route retourne un code 404 lorsque le point set n'est pas trouvé.
+    Args:
+        client (flask.TestClient): client de test Flask.
+        monkeypatch (pytest.MonkeyPatch): outil de patching pour les tests.
+    Returns:
+        None
+    """
+    # Forcer tri.get_point_set à lever une exception simulant "point set not found"
+    def fake_get_point_set():
+        raise Exception("Point set not found")
+
+    monkeypatch.setattr(tri, "get_point_set", fake_get_point_set)
+    response = client.get("/triangulation/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 404
+    assert verify_error_json_response(response)
 
 
 def test_triangulation_internal_error_returns_500(client, monkeypatch):

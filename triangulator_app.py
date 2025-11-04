@@ -8,7 +8,11 @@ tri = Triangulator()
 
 @app.route("/triangulation/<pointSetId>", methods=["GET"])
 def get_triangulation(pointSetId: str):
-    return jsonify({"code": "", "message": pointSetId}), 0
+    try:
+        Triangulator.triangulate(tri, pointSetId)
+        return jsonify({"code": "ok", "message": pointSetId}), 200
+    except Exception as e:
+        return jsonify({"code": "error", "message": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
