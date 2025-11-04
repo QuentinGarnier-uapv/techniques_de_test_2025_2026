@@ -54,7 +54,6 @@ def test_pointset_not_found_returns_404(client, monkeypatch):
     Returns:
         None
     """
-    # Forcer tri.get_point_set à lever une exception simulant "point set not found"
     def fake_get_point_set():
         raise Exception("Point set not found")
 
@@ -65,6 +64,14 @@ def test_pointset_not_found_returns_404(client, monkeypatch):
 
 
 def test_triangulation_internal_error_returns_500(client, monkeypatch):
+    """
+    Teste que la route retourne un code 500 en cas d'erreur interne du serveur.
+    Args:
+        client (flask.TestClient): client de test Flask.
+        monkeypatch (pytest.MonkeyPatch): outil de patching pour les tests.
+    Returns:
+        None
+    """
     def fake_get_point_set():
         raise Exception("internal server error")
     monkeypatch.setattr(tri, "get_point_set", fake_get_point_set)
@@ -75,6 +82,14 @@ def test_triangulation_internal_error_returns_500(client, monkeypatch):
 
 
 def test_pointset_manager_unavailable_returns_503(client, monkeypatch):
+    """
+    Teste que la route retourne un code 503 lorsque le gestionnaire de point sets est indisponible.
+    Args:
+        client (flask.TestClient): client de test Flask.
+        monkeypatch (pytest.MonkeyPatch): outil de patching pour les tests.
+    Returns:
+        None
+    """
     def fake_get_point_set():
         raise Exception("point set manager unavailable")
     monkeypatch.setattr(tri, "get_point_set", fake_get_point_set)
