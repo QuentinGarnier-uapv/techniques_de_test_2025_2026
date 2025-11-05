@@ -26,7 +26,20 @@ def client():
 
 
 def test_triangulation_success_binary(client, monkeypatch):
-    assert True
+    """
+    Teste que la route retourne une triangulation binaire réussie.
+    Args:
+        client (flask.TestClient): client de test Flask.
+        monkeypatch (pytest.MonkeyPatch): outil de patching pour les tests.
+    Returns:
+        None
+    """
+    def fake_triangulate(pointSetId):
+        return b"\x00\x00\x00\x00"
+    monkeypatch.setattr(tri, "triangulate", fake_triangulate)
+    response = client.get("/triangulation/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 200
+    assert response.data == b"\x00\x00\x00\x00"
 
 
 def test_invalid_uuid_returns_400(client, monkeypatch):
