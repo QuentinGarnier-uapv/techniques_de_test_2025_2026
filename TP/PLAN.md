@@ -69,9 +69,14 @@ Utiliser Flask.test_client() et un mock du PSM simulant :
 
 ### 3. Tests unitaires — Encodage/Décodage binaire Triangles
 
-Ici il ne me semble pas necessaire de tester l'encodage/décodage des points étant donné que cela sort du perimetre du TP.
+Il me semble necessaire de tester l'encodage et le décodage. Cela reviens a tester la structure des données du projet :
+- Point
+- PointSet
+- Triangle
+- Triangles
+En effet, ce sont les briques élémentaires de notre projet et il est important de s'assurer que leur manipulation binaire est correcte.
 
-**But :** vérifier que les fonctions de lecture/écriture des structures binaires fonctionnent correctement.
+**But :** vérifier que les fonctions de lecture/écriture des structures binaires fonctionnent correctement pour chaque model.
 **Méthode :**
 
 * Tester un aller-retour complet encode -> decode -> encode.

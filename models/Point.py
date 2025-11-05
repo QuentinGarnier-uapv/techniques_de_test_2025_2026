@@ -1,4 +1,3 @@
-# python
 from dataclasses import dataclass
 import struct
 from typing import Tuple

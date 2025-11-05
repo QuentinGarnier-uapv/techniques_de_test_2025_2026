@@ -1,4 +1,3 @@
-# python
 from dataclasses import dataclass, field
 from typing import List
 import struct
@@ -19,3 +18,4 @@ class PointSet:
         then count * 8 bytes for points.
         """
         return None
+

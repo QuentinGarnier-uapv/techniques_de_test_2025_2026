@@ -1,4 +1,3 @@
-# python
 from dataclasses import dataclass, field
 from typing import List
 import struct
@@ -10,10 +9,6 @@ from .PointSet import PointSet
 class Triangles:
     points: List[Point] = field(default_factory=list)
     triangles: List[Triangle] = field(default_factory=list)
-
-    def validate(self):
-        """Ensure triangle indices reference existing points."""
-
 
     def to_bytes(self) -> bytes | None:
         """
@@ -27,3 +22,4 @@ class Triangles:
     def from_bytes(cls, data: bytes) -> "Triangles | None":
         """Deserialize Triangles from bytes according to spec."""
         return None
+

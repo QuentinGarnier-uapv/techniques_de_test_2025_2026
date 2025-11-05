@@ -1,4 +1,3 @@
-# python
 from dataclasses import dataclass
 import struct
 
@@ -13,6 +12,7 @@ class Triangle:
         return None
 
     @classmethod
-    def from_bytes(cls, b: bytes) -> "Triangle | None":
+    def from_bytes(cls, b: bytes) -> "Triangle":
         """Deserialize 12 bytes into a Triangle."""
         return None
+
