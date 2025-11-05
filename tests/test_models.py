@@ -1,6 +1,8 @@
 import math
 from models.Point import Point
 from models.Triangle import Triangle
+from models.PointSet import PointSet
+from models.Triangles import Triangles
 
 
 def approx_points(p1: Point, p2: Point, rel_tol=1e-6):
@@ -27,15 +29,47 @@ def test_triangle_bytes():
 
 def test_pointset_bytes():
     """PointSet.to_bytes -> PointSet.from_bytes preserves points."""
+    pts = [Point(0.0, 0.0), Point(1.0, 2.0), Point(-3.5, 4.25)]
+    ps = PointSet(points=pts)
+    b = ps.to_bytes()
+    assert isinstance(b, (bytes, bytearray))
+    ps2 = PointSet.from_bytes(b)
+    assert len(ps.points) == len(ps2.points)
+    for a, bpt in zip(ps.points, ps2.points):
+        assert approx_points(a, bpt)
 
 
 def test_pointset_empty_bytes():
     """Empty PointSet bytes."""
+    ps = PointSet(points=[])
+    b = ps.to_bytes()
+    assert isinstance(b, (bytes, bytearray))
+    ps2 = PointSet.from_bytes(b)
+    assert ps2.points == []
 
 
 def test_triangles_bytes():
     """Triangles.to_bytes -> Triangles.from_bytes preserves points and indices."""
+    pts = [Point(0.0, 0.0), Point(1.0, 0.0), Point(0.0, 1.0), Point(1.0, 1.0)]
+    tris = [Triangle(0, 1, 2), Triangle(1, 3, 2)]
+    T = Triangles(points=pts, triangles=tris)
+    b = T.to_bytes()
+    assert isinstance(b, (bytes, bytearray))
+    T2 = Triangles.from_bytes(b)
+    assert len(T.points) == len(T2.points)
+    assert len(T.triangles) == len(T2.triangles)
+    for p_old, p_new in zip(T.points, T2.points):
+        assert approx_points(p_old, p_new)
+    for t_old, t_new in zip(T.triangles, T2.triangles):
+        assert (t_old.a, t_old.b, t_old.c) == (t_new.a, t_new.b, t_new.c)
+
 
 def test_triangles_empty_bytes():
     """Empty Triangles (no points, no triangles)."""
+    T = Triangles(points=[], triangles=[])
+    b = T.to_bytes()
+    assert isinstance(b, (bytes, bytearray))
+    T2 = Triangles.from_bytes(b)
+    assert T2.points == []
+    assert T2.triangles == []
 

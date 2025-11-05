@@ -12,7 +12,6 @@ class Triangle:
         return None
 
     @classmethod
-    def from_bytes(cls, b: bytes) -> "Triangle":
-        """Deserialize 12 bytes into a Triangle."""
+    def from_bytes(cls, b: bytes) -> "Triangle | None":
         return None
 
