@@ -1,5 +1,6 @@
 import math
 from models.Point import Point
+from models.Triangle import Triangle
 
 
 def approx_points(p1: Point, p2: Point, rel_tol=1e-6):
@@ -17,6 +18,11 @@ def test_point_bytes():
 
 def test_triangle_bytes():
     """Triangle.to_bytes -> Triangle.from_bytes preserves indices."""
+    t = Triangle(0, 5, 2)
+    b = t.to_bytes()
+    assert isinstance(b, (bytes, bytearray))
+    t2 = Triangle.from_bytes(b)
+    assert (t.a, t.b, t.c) == (t2.a, t2.b, t2.c)
 
 
 def test_pointset_bytes():
