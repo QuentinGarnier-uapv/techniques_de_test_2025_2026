@@ -37,10 +37,10 @@ def test_invalid_uuid_returns_400(client, monkeypatch):
     Returns:
         None
     """
-    def fake_get_point_set():
+    def fake_triangulate():
         raise Exception("incorrect uuid format")
 
-    monkeypatch.setattr(tri, "get_point_set", fake_get_point_set)
+    monkeypatch.setattr(tri, "triangulate", fake_triangulate)
     response = client.get("/triangulation/***invalid-uuid***")
     assert response.status_code == 400
     assert verify_error_json_response(response)
@@ -54,10 +54,10 @@ def test_pointset_not_found_returns_404(client, monkeypatch):
     Returns:
         None
     """
-    def fake_get_point_set():
+    def fake_triangulate():
         raise Exception("Point set not found")
 
-    monkeypatch.setattr(tri, "get_point_set", fake_get_point_set)
+    monkeypatch.setattr(tri, "triangulate", fake_triangulate)
     response = client.get("/triangulation/00000000-0000-0000-0000-000000000000")
     assert response.status_code == 404
     assert verify_error_json_response(response)
@@ -72,9 +72,9 @@ def test_triangulation_internal_error_returns_500(client, monkeypatch):
     Returns:
         None
     """
-    def fake_get_point_set():
+    def fake_triangulate():
         raise Exception("internal server error")
-    monkeypatch.setattr(tri, "get_point_set", fake_get_point_set)
+    monkeypatch.setattr(tri, "triangulate", fake_triangulate)
     response = client.get("/triangulation/00000000-0000-0000-0000-000000000000")
     assert response.status_code == 500
     assert verify_error_json_response(response)
@@ -90,9 +90,9 @@ def test_pointset_manager_unavailable_returns_503(client, monkeypatch):
     Returns:
         None
     """
-    def fake_get_point_set():
+    def fake_triangulate():
         raise Exception("point set manager unavailable")
-    monkeypatch.setattr(tri, "get_point_set", fake_get_point_set)
+    monkeypatch.setattr(tri, "triangulate", fake_triangulate)
     response = client.get("/triangulation/00000000-0000-0000-0000-000000000000")
     assert response.status_code == 503
     assert verify_error_json_response(response)
