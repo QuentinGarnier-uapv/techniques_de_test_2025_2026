@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import struct
 
 @dataclass
 class Triangle:
@@ -7,11 +6,12 @@ class Triangle:
     b: int
     c: int
 
-    def to_bytes(self) -> bytes | None:
+    def to_bytes(self) -> bytes:
         """Serialize as three unsigned 4-byte integers (little-endian)."""
-        return None
+        # TODO: Implémenter
+        return b""
 
     @classmethod
-    def from_bytes(cls, b: bytes) -> "Triangle | None":
-        return None
-
+    def from_bytes(cls, b: bytes) -> "Triangle":
+        # TODO: Implémenter
+        raise NotImplementedError("Non implémenté")
