@@ -1,7 +1,8 @@
 import math
+
 from models.Point import Point
-from models.Triangle import Triangle
 from models.PointSet import PointSet
+from models.Triangle import Triangle
 from models.Triangles import Triangles
 
 

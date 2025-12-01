@@ -18,8 +18,7 @@ class Triangulator:
             raise e
 
     def compute(self, pset: PointSet) -> Triangles:
-        """
-        Algorithme de triangulation.
+        """Algorithme de triangulation.
         Prend un PointSet en entrée et retourne un objet Triangles.
         """
         return Triangles(points=pset.points, triangles=[])

@@ -8,3 +8,25 @@ select = [
     "SIM",
     "I",
 ]
+
+[tool.ruff]
+line-length = 120
+
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "tests",
+    "setup.py",
+]
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "tests/*",
+    "setup.py",
+    "*/__init__.py",
+    ".venv/*"
+]

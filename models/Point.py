@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple
+
 
 @dataclass
 class Point:
@@ -18,5 +18,5 @@ class Point:
         # On retourne un point par défaut ou on laisse planter le test proprement
         raise NotImplementedError("La méthode from_bytes n'est pas encore implémentée")
 
-    def to_tuple(self) -> Tuple[float, float]:
+    def to_tuple(self) -> tuple[float, float]:
         return (self.x, self.y)

@@ -1,11 +1,10 @@
-from urllib import response
 import pytest
+
 from triangulator_app import app, tri
 
 
 def verify_error_json_response(response):
-    """
-    Vérifie que la réponse JSON contient le code d'erreur et le message attendus.
+    """Vérifie que la réponse JSON contient le code d'erreur et le message attendus.
     """
     expected_code = "TRIANGULATION_FAILED"
     expected_message = "Triangulation could not be computed for the given point set."
@@ -26,8 +25,7 @@ def client():
 
 
 def test_triangulation_success_binary(client, monkeypatch):
-    """
-    Teste que la route retourne une triangulation binaire réussie.
+    """Teste que la route retourne une triangulation binaire réussie.
     """
     def fake_triangulate(pointSetId):
         return b"\x00\x00\x00\x00"
@@ -41,8 +39,7 @@ def test_triangulation_success_binary(client, monkeypatch):
 
 
 def test_invalid_uuid_returns_400(client, monkeypatch):
-    """
-    Teste que la route retourne un code 400 pour un UUID invalide.
+    """Teste que la route retourne un code 400 pour un UUID invalide.
     """
     def fake_triangulate(pointSetId):
         raise Exception("incorrect uuid format")
@@ -54,8 +51,7 @@ def test_invalid_uuid_returns_400(client, monkeypatch):
     assert verify_error_json_response(response)
 
 def test_pointset_not_found_returns_404(client, monkeypatch):
-    """
-    Teste que la route retourne un code 404 lorsque le point set n'est pas trouvé.
+    """Teste que la route retourne un code 404 lorsque le point set n'est pas trouvé.
     """
     def fake_triangulate(pointSetId):
         raise Exception("Point set not found")
@@ -68,8 +64,7 @@ def test_pointset_not_found_returns_404(client, monkeypatch):
 
 
 def test_triangulation_internal_error_returns_500(client, monkeypatch):
-    """
-    Teste que la route retourne un code 500 en cas d'erreur interne du serveur.
+    """Teste que la route retourne un code 500 en cas d'erreur interne du serveur.
     """
     def fake_triangulate(pointSetId):
         raise Exception("internal server error")
@@ -81,8 +76,7 @@ def test_triangulation_internal_error_returns_500(client, monkeypatch):
 
 
 def test_pointset_manager_unavailable_returns_503(client, monkeypatch):
-    """
-    Teste que la route retourne un code 503 lorsque le gestionnaire de point sets est indisponible.
+    """Teste que la route retourne un code 503 lorsque le gestionnaire de point sets est indisponible.
     """
     def fake_triangulate(pointSetId):
         raise Exception("point set manager unavailable")

@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, Response
+from flask import Flask, Response, jsonify
+
 from Triangulator import Triangulator
 
 app = Flask(__name__)

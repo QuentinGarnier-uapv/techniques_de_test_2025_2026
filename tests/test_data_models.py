@@ -5,8 +5,7 @@ from models.Triangles import Triangles
 
 
 def test_pointset_encode_decode():
-    """
-    Vérifie qu'un PointSet s'encode et se décode correctement selon la spec binaire.
+    """Vérifie qu'un PointSet s'encode et se décode correctement selon la spec binaire.
     """
     pts = [Point(1.0, 2.0), Point(3.5, 4.5)]
     pset = PointSet(pts)
@@ -26,8 +25,7 @@ def test_pointset_encode_decode():
 
 
 def test_triangles_encode_decode():
-    """
-    Vérifie l'encodage complet : PointSet + Liste de Triangles.
+    """Vérifie l'encodage complet : PointSet + Liste de Triangles.
     """
     pts = [Point(0.0, 0.0), Point(1.0, 0.0), Point(0.0, 1.0)]
     tris_list = [Triangle(0, 1, 2)]
