@@ -57,3 +57,30 @@ def test_one_point_returns_empty_triangles():
     pset = PointSet([Point(0.0, 0.0)])
     result = tri.compute(pset)
     assert len(result.triangles) == 0
+
+def test_two_points_returns_empty_triangles():
+    """
+    Given two distinct points, Triangulator should return zero triangles.
+    """
+    pset = PointSet([Point(0.0, 0.0), Point(1.0, 1.0)])
+    result = tri.compute(pset)
+    assert len(result.triangles) == 0
+
+def test_duplicate_points_handled_or_error():
+    """
+    Given point sets containing duplicate points, return triangles based on unique geometry
+    or simply handle it gracefully without crashing.
+    """
+    points = [Point(0, 0), Point(1, 0), Point(0, 1), Point(0, 0)]
+    pset = PointSet(points)
+    result = tri.compute(pset)
+    assert len(result.triangles) <= 1
+
+def test_colinear_points_no_triangles():
+    """
+    Given multiple colinear points, triangulation must produce zero triangles
+    """
+    points = [Point(0, 0), Point(1, 1), Point(2, 2)]
+    pset = PointSet(points)
+    result = tri.compute(pset)
+    assert len(result.triangles) == 0
