@@ -84,3 +84,24 @@ def test_colinear_points_no_triangles():
     pset = PointSet(points)
     result = tri.compute(pset)
     assert len(result.triangles) == 0
+
+def test_triangle_indices_within_pointset_range():
+    """
+    For any produced triangle, all vertex indices must be within [0, len(points)-1].
+    """
+    points = [Point(0, 0), Point(10, 0), Point(5, 5)]
+    pset = PointSet(points)
+    result = tri.compute(pset)
+    max_index = len(points) - 1
+    for t in result.triangles:
+        assert 0 <= t.a <= max_index
+        assert 0 <= t.b <= max_index
+        assert 0 <= t.c <= max_index
+
+def test_invalid_input_type_raises():
+    """
+    Given invalid input types (e.g. None, wrong structure), Triangulator should
+    raise an Exception (AttributeError or TypeError).
+    """
+    with pytest.raises((AttributeError, TypeError)):
+        tri.compute(None)
