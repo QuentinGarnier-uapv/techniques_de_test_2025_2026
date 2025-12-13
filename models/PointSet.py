@@ -1,5 +1,6 @@
-from dataclasses import dataclass, field
+"""Module handling PointSet data model."""
 import struct
+from dataclasses import dataclass, field
 
 from .Point import Point
 
@@ -8,6 +9,8 @@ from .Point import Point
 
 @dataclass
 class PointSet:
+    """Represent a set of points."""
+
     points: list[Point] = field(default_factory=list)
 
     def to_bytes(self) -> bytes:

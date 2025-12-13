@@ -1,5 +1,6 @@
-from dataclasses import dataclass, field
+"""Module handling Triangles data model."""
 import struct
+from dataclasses import dataclass, field
 
 from .Point import Point
 from .PointSet import PointSet
@@ -8,6 +9,8 @@ from .Triangle import Triangle
 
 @dataclass
 class Triangles:
+    """Represent a collection of triangles."""
+
     points: list[Point] = field(default_factory=list)
     triangles: list[Triangle] = field(default_factory=list)
 

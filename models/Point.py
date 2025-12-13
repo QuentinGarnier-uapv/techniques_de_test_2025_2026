@@ -1,9 +1,15 @@
-from dataclasses import dataclass
+"""Module handling Point data model."""
 import struct
-# note formatage : <ff => little-endian (octet de poids faible en premier), 2 floats (32 bits chacun) => perte de précision car en python floats de 64 bits
+from dataclasses import dataclass
+
+# note formatage : <ff => little-endian (octet de poids faible en premier),
+# 2 floats (32 bits chacun) => perte de précision car en python floats de 64 bits
+
 
 @dataclass
 class Point:
+    """Represent a 2D point with x and y coordinates."""
+
     x: float
     y: float
 
@@ -21,4 +27,5 @@ class Point:
             raise ValueError("Invalid byte sequence for Point") from e
 
     def to_tuple(self) -> tuple[float, float]:
+        """Convert point to a tuple of (x, y)."""
         return (self.x, self.y)

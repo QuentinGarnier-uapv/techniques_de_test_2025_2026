@@ -1,8 +1,12 @@
-from dataclasses import dataclass
+"""Module handling Triangle data model."""
 import struct
+from dataclasses import dataclass
+
 
 @dataclass
 class Triangle:
+    """Represent a triangle by 3 indices to points."""
+
     a: int
     b: int
     c: int
@@ -13,6 +17,7 @@ class Triangle:
 
     @classmethod
     def from_bytes(self, data: bytes) -> "Triangle":
+        """Deserialize Triangle from bytes."""
         if len(data) < 12:
             raise ValueError("Invalid byte sequence for Triangle")
         try:
