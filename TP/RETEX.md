@@ -19,3 +19,6 @@ Choix algo triangulation :
 
 => Une implémentation personnelle sera forcement moins optimisé qu'une utilisation spécialisée. Ainsi la gestion de la mémoire est loin d'être optimale car beaucoup de listes sont crées
 
+Tests fixés :
+- linter : j'ai simplement corrigé les erreurs donnée en executant le make lint (beaucoup de docstring manquante, lignes trop longues, etc) => voir lint_report.txt
+
