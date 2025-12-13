@@ -61,15 +61,40 @@ class Triangles:
     triangles: list[Triangle] = field(default_factory=list)
 
     def to_bytes(self) -&gt; bytes:
-        &#34;&#34;&#34;Binary layout implementation.&#34;&#34;&#34;
-        # TODO: Implémenter
-        return b&#34;&#34;
+        &#34;&#34;&#34;Binary layout implementation.&#34;&#34;&#34;     
+        ps_bytes = PointSet(self.points).to_bytes()
+        tris_header = struct.pack(&#34;&lt;I&#34;, len(self.triangles))
+        tris_body = b&#34;&#34;.join(t.to_bytes() for t in self.triangles)
+        return ps_bytes + tris_header + tris_body
 
     @classmethod
-    def from_bytes(cls, data: bytes) -&gt; &#34;Triangles&#34;:
+    def from_bytes(self, data: bytes) -&gt; &#34;Triangles&#34;:
         &#34;&#34;&#34;Deserialize Triangles from bytes.&#34;&#34;&#34;
-        # TODO: Implémenter
-        raise NotImplementedError(&#34;Non implémenté&#34;)</code></pre>
+        if len(data) &lt; 4:
+            raise ValueError(&#34;Data too short&#34;)
+        
+        ps_count = struct.unpack(&#34;&lt;I&#34;, data[:4])[0]
+        ps_size = 4 + ps_count * 8
+        if len(data) &lt; ps_size:
+            raise ValueError(&#34;Data too short for PointSet&#34;)
+        
+        ps_data = data[:ps_size]
+        ps = PointSet.from_bytes(ps_data)
+        offset = ps_size
+        if len(data) &lt; offset + 4:
+            raise ValueError(&#34;Data too short for Triangle count&#34;)
+        
+        t_count = struct.unpack(&#34;&lt;I&#34;, data[offset:offset+4])[0]
+        offset += 4
+        t_size = 12
+        triangles = []
+        for _ in range(t_count):
+            if offset + t_size &gt; len(data):
+                raise ValueError(&#34;Data too short for expected triangles&#34;)
+            triangle = data[offset : offset + t_size]
+            triangles.append(Triangle.from_bytes(triangle))
+            offset += t_size
+        return self(points=ps.points, triangles=triangles)</code></pre>
 </details>
 <div class="desc"><p>Triangles(points: list[techniques_de_test_2025_2026.models.Point.Point] = <factory>, triangles: list[techniques_de_test_2025_2026.models.Triangle.Triangle] = <factory>)</p></div>
 <h3>Static methods</h3>
@@ -103,9 +128,11 @@ class Triangles:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def to_bytes(self) -&gt; bytes:
-    &#34;&#34;&#34;Binary layout implementation.&#34;&#34;&#34;
-    # TODO: Implémenter
-    return b&#34;&#34;</code></pre>
+    &#34;&#34;&#34;Binary layout implementation.&#34;&#34;&#34;     
+    ps_bytes = PointSet(self.points).to_bytes()
+    tris_header = struct.pack(&#34;&lt;I&#34;, len(self.triangles))
+    tris_body = b&#34;&#34;.join(t.to_bytes() for t in self.triangles)
+    return ps_bytes + tris_header + tris_body</code></pre>
 </details>
 <div class="desc"><p>Binary layout implementation.</p></div>
 </dd>

@@ -62,15 +62,16 @@ class Point:
 
     def to_bytes(self) -&gt; bytes:
         &#34;&#34;&#34;Serialize as two 4-byte floats (little-endian).&#34;&#34;&#34;
-        # TODO: Implémenter la conversion
-        return b&#34;&#34;
+        return struct.pack(&#34;&lt;ff&#34;, self.x, self.y)
 
     @classmethod
     def from_bytes(cls, b: bytes) -&gt; &#34;Point&#34;:
         &#34;&#34;&#34;Deserialize 8 bytes into a Point.&#34;&#34;&#34;
-        # TODO: Implémenter la lecture
-        # On retourne un point par défaut ou on laisse planter le test proprement
-        raise NotImplementedError(&#34;La méthode from_bytes n&#39;est pas encore implémentée&#34;)
+        try:
+            x, y = struct.unpack(&#34;&lt;ff&#34;, b)
+            return cls(x, y)
+        except struct.error as e:
+            raise ValueError(&#34;Invalid byte sequence for Point&#34;) from e
 
     def to_tuple(self) -&gt; tuple[float, float]:
         return (self.x, self.y)</code></pre>
@@ -108,8 +109,7 @@ class Point:
 </summary>
 <pre><code class="python">def to_bytes(self) -&gt; bytes:
     &#34;&#34;&#34;Serialize as two 4-byte floats (little-endian).&#34;&#34;&#34;
-    # TODO: Implémenter la conversion
-    return b&#34;&#34;</code></pre>
+    return struct.pack(&#34;&lt;ff&#34;, self.x, self.y)</code></pre>
 </details>
 <div class="desc"><p>Serialize as two 4-byte floats (little-endian).</p></div>
 </dd>

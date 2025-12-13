@@ -61,14 +61,30 @@ class PointSet:
 
     def to_bytes(self) -&gt; bytes:
         &#34;&#34;&#34;Format: 4 bytes unsigned int count + each point (8 bytes).&#34;&#34;&#34;
-        # TODO: Implémenter
-        return b&#34;&#34;
+        header = struct.pack(&#34;&lt;I&#34;, len(self.points))
+        body = b&#34;&#34;
+        for p in self.points:
+            body += p.to_bytes()
+        return header + body
 
     @classmethod
-    def from_bytes(cls, data: bytes) -&gt; &#34;PointSet&#34;:
+    def from_bytes(self, data: bytes) -&gt; &#34;PointSet&#34;:
         &#34;&#34;&#34;Parse PointSet from bytes.&#34;&#34;&#34;
-        # TODO: Implémenter
-        raise NotImplementedError(&#34;Non implémenté&#34;)</code></pre>
+        if len(data) &lt; 4:
+            raise ValueError(&#34;Data too short&#34;)
+        
+        count = struct.unpack(&#34;&lt;I&#34;, data[:4])[0]
+        points = []
+        offset = 4
+        
+        for _ in range(count):
+            if offset + 8 &gt; len(data):
+                raise ValueError(&#34;Data too short for points&#34;)
+            bytePoint = data[offset : offset + 8]
+            points.append(Point.from_bytes(bytePoint))
+            offset += 8
+            
+        return self(points=points)</code></pre>
 </details>
 <div class="desc"><p>PointSet(points: list[techniques_de_test_2025_2026.models.Point.Point] = <factory>)</p></div>
 <h3>Static methods</h3>
@@ -99,8 +115,11 @@ class PointSet:
 </summary>
 <pre><code class="python">def to_bytes(self) -&gt; bytes:
     &#34;&#34;&#34;Format: 4 bytes unsigned int count + each point (8 bytes).&#34;&#34;&#34;
-    # TODO: Implémenter
-    return b&#34;&#34;</code></pre>
+    header = struct.pack(&#34;&lt;I&#34;, len(self.points))
+    body = b&#34;&#34;
+    for p in self.points:
+        body += p.to_bytes()
+    return header + body</code></pre>
 </details>
 <div class="desc"><p>Format: 4 bytes unsigned int count + each point (8 bytes).</p></div>
 </dd>

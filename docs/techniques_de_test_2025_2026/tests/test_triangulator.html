@@ -44,6 +44,30 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="techniques_de_test_2025_2026.tests.test_triangulator.test_all_collinear_points_raises_error"><code class="name flex">
+<span>def <span class="ident">test_all_collinear_points_raises_error</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_all_collinear_points_raises_error():
+    &#34;&#34;&#34;If all points are collinear, the triangulator should raise an error 
+    indicating that triangulation is impossible (or at least fail explicitly),
+    rather than returning an empty set or a partial result.
+    &#34;&#34;&#34;
+    points = [Point(0, 0), Point(1, 1), Point(2, 2), Point(10, 10)]
+    pset = PointSet(points)
+    
+    # We expect a ValueError (or similar) when the input is invalid for triangulation
+    with pytest.raises(ValueError, match=&#34;Collinear points&#34;):
+        tri.compute(pset)</code></pre>
+</details>
+<div class="desc"><p>If all points are collinear, the triangulator should raise an error
+indicating that triangulation is impossible (or at least fail explicitly),
+rather than returning an empty set or a partial result.</p></div>
+</dd>
 <dt id="techniques_de_test_2025_2026.tests.test_triangulator.test_colinear_points_no_triangles"><code class="name flex">
 <span>def <span class="ident">test_colinear_points_no_triangles</span></span>(<span>)</span>
 </code></dt>
@@ -57,8 +81,8 @@ el.replaceWith(d);
     &#34;&#34;&#34;
     points = [Point(0, 0), Point(1, 1), Point(2, 2)]
     pset = PointSet(points)
-    result = tri.compute(pset)
-    assert len(result.triangles) == 0</code></pre>
+    with pytest.raises(ValueError, match=&#34;Collinear points&#34;):
+        tri.compute(pset)</code></pre>
 </details>
 <div class="desc"><p>Given multiple colinear points, triangulation must produce zero triangles</p></div>
 </dd>
@@ -91,13 +115,16 @@ or simply handle it gracefully without crashing.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_invalid_input_type_raises():
-    &#34;&#34;&#34;Given invalid input types (e.g. None, wrong structure), Triangulator should
+    &#34;&#34;&#34;Test invalid input types handling.
+
+    Given invalid input types (e.g. None, wrong structure), Triangulator should
     raise an Exception (AttributeError or TypeError).
     &#34;&#34;&#34;
     with pytest.raises((AttributeError, TypeError)):
         tri.compute(None)</code></pre>
 </details>
-<div class="desc"><p>Given invalid input types (e.g. None, wrong structure), Triangulator should
+<div class="desc"><p>Test invalid input types handling.</p>
+<p>Given invalid input types (e.g. None, wrong structure), Triangulator should
 raise an Exception (AttributeError or TypeError).</p></div>
 </dd>
 <dt id="techniques_de_test_2025_2026.tests.test_triangulator.test_no_points_returns_empty_triangles"><code class="name flex">
@@ -256,6 +283,7 @@ and the triangle should reference the three input points.</p></div>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="techniques_de_test_2025_2026.tests.test_triangulator.test_all_collinear_points_raises_error" href="#techniques_de_test_2025_2026.tests.test_triangulator.test_all_collinear_points_raises_error">test_all_collinear_points_raises_error</a></code></li>
 <li><code><a title="techniques_de_test_2025_2026.tests.test_triangulator.test_colinear_points_no_triangles" href="#techniques_de_test_2025_2026.tests.test_triangulator.test_colinear_points_no_triangles">test_colinear_points_no_triangles</a></code></li>
 <li><code><a title="techniques_de_test_2025_2026.tests.test_triangulator.test_duplicate_points_handled_or_error" href="#techniques_de_test_2025_2026.tests.test_triangulator.test_duplicate_points_handled_or_error">test_duplicate_points_handled_or_error</a></code></li>
 <li><code><a title="techniques_de_test_2025_2026.tests.test_triangulator.test_invalid_input_type_raises" href="#techniques_de_test_2025_2026.tests.test_triangulator.test_invalid_input_type_raises">test_invalid_input_type_raises</a></code></li>

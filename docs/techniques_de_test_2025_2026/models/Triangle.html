@@ -62,20 +62,24 @@ class Triangle:
     c: int
 
     def to_bytes(self) -&gt; bytes:
-        &#34;&#34;&#34;Serialize as three unsigned 4-byte integers (little-endian).&#34;&#34;&#34;
-        # TODO: Implémenter
-        return b&#34;&#34;
+        &#34;&#34;&#34;Format: 3*4 bytes unsigned int.&#34;&#34;&#34;
+        return struct.pack(&#34;&lt;III&#34;, self.a, self.b, self.c)
 
     @classmethod
-    def from_bytes(cls, b: bytes) -&gt; &#34;Triangle&#34;:
-        # TODO: Implémenter
-        raise NotImplementedError(&#34;Non implémenté&#34;)</code></pre>
+    def from_bytes(self, data: bytes) -&gt; &#34;Triangle&#34;:
+        if len(data) &lt; 12:
+            raise ValueError(&#34;Invalid byte sequence for Triangle&#34;)
+        try:
+            a, b, c = struct.unpack(&#34;&lt;III&#34;, data)
+            return self(a, b, c)
+        except struct.error as e:
+            raise ValueError(&#34;Invalid byte sequence for Triangle&#34;) from e</code></pre>
 </details>
 <div class="desc"><p>Triangle(a: int, b: int, c: int)</p></div>
 <h3>Static methods</h3>
 <dl>
 <dt id="techniques_de_test_2025_2026.models.Triangle.Triangle.from_bytes"><code class="name flex">
-<span>def <span class="ident">from_bytes</span></span>(<span>b: bytes) ‑> <a title="techniques_de_test_2025_2026.models.Triangle.Triangle" href="#techniques_de_test_2025_2026.models.Triangle.Triangle">Triangle</a></span>
+<span>def <span class="ident">from_bytes</span></span>(<span>data: bytes) ‑> <a title="techniques_de_test_2025_2026.models.Triangle.Triangle" href="#techniques_de_test_2025_2026.models.Triangle.Triangle">Triangle</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -107,11 +111,10 @@ class Triangle:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def to_bytes(self) -&gt; bytes:
-    &#34;&#34;&#34;Serialize as three unsigned 4-byte integers (little-endian).&#34;&#34;&#34;
-    # TODO: Implémenter
-    return b&#34;&#34;</code></pre>
+    &#34;&#34;&#34;Format: 3*4 bytes unsigned int.&#34;&#34;&#34;
+    return struct.pack(&#34;&lt;III&#34;, self.a, self.b, self.c)</code></pre>
 </details>
-<div class="desc"><p>Serialize as three unsigned 4-byte integers (little-endian).</p></div>
+<div class="desc"><p>Format: 3*4 bytes unsigned int.</p></div>
 </dd>
 </dl>
 </dd>
