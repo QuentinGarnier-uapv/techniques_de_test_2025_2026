@@ -94,7 +94,7 @@ class Triangulator:
         t0 = Triangle(n, n+1, n+2)
         c0, r0_sq = self.get_circumcircle(st_p1, st_p2, st_p3)
         
-        # liste des triangles actifs (triangles, centre_x, centre_y, rayon au carré)
+        # liste des triangles actifs (triangle, centre_x, centre_y, rayon au carré)
         active_triangles = [(t0, c0[0], c0[1], r0_sq)]
         final_triangles = []
         
@@ -107,12 +107,10 @@ class Triangulator:
             for item in active_triangles:
                 t, cx, cy, r_sq = item
                 
-                # Optimisation:
-                # Si le point est a droite du cercle, ce triangle
-                # ne sera jamais 'mauvais' à nouveau (parce que les points sont triés par X).
-                # Nous pouvons le retirer de active_triangles.
-                
                 dx_dist = px - cx
+                # Si le carré de la distance sur x est supérieur au rayon au carré
+                # ET que le point est à droite du centre (dx_dist > 0),
+                # alors on est sûr qu'aucun point futur ne tombera dans ce cercle.
                 if dx_dist > 0 and (dx_dist**2) > r_sq:
                     final_triangles.append(t)
                     continue
@@ -126,6 +124,7 @@ class Triangulator:
             
             active_triangles = new_active_triangles
             
+            # polygon = frontiére du polygone formé par bad_triangles
             polygon = []
             # Trouve la frontière du polygone formé par bad_triangles
             # Utilise un dictionnaire pour compter les arêtes: (min, max) -> count
@@ -133,6 +132,7 @@ class Triangulator:
             for t in bad_triangles:
                 for edge in [(t.a, t.b), (t.b, t.c), (t.c, t.a)]:
                     sorted_edge = tuple(sorted(edge))
+                    # On compte le nombre d'occurences de chaque arete (arrete comptée 2 fois si elle est partagée par 2 triangles / arrete comptée 1 fois si elle est frontière)
                     edge_counts[sorted_edge] = edge_counts.get(sorted_edge, 0) + 1
             
             polygon = [edge for edge, count in edge_counts.items() if count == 1]
