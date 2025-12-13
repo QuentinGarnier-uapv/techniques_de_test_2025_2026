@@ -1,3 +1,4 @@
+"""Module implementing the Triangulator service."""
 import urllib.error
 import urllib.request
 
@@ -8,19 +9,23 @@ from models.Triangles import Triangles
 
 
 class Triangulator:
+    """Triangulator service implementation."""
+
     def __init__(self):
+        """Initialize the triangulator."""
         self.manager_url = "http://localhost:3000"
 
     def triangulate(self, pointSetId):
-        """Orchestrateur (Service Layer)"""
+        """Orchestrateur (Service Layer)."""
         try:
             pset = self.get_point_set(pointSetId)
             result = self.compute(pset)
             return result.to_bytes()
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
     def get_point_set(self, pointSetId):
+        """Get point set from manager by ID."""
         # Basic UUID validation (length and hex) - simplified
         if len(pointSetId) != 36:
              raise Exception("incorrect uuid format")
@@ -32,21 +37,23 @@ class Triangulator:
                 return PointSet.from_bytes(data)
         except urllib.error.HTTPError as e:
             if e.code == 404:
-                raise Exception("Point set not found")
+                raise Exception("Point set not found") from e
             elif e.code == 503:
-                raise Exception("point set manager unavailable")
+                raise Exception("point set manager unavailable") from e
             else:
-                raise Exception(f"HTTP Error {e.code}")
-        except urllib.error.URLError:
-            raise Exception("point set manager unavailable")
-        except Exception as e:
-            raise e
+                raise Exception(f"HTTP Error {e.code}") from e
+        except urllib.error.URLError as e:
+            raise Exception("point set manager unavailable") from e
+        except Exception:
+            raise
 
     def compute(self, pset: PointSet) -> Triangles:
         """Algorithme de triangulation de Bowyer-Watson.
+
         Prend un PointSet en entrée et retourne un objet Triangles.
         """
-        # Tri des points par ordre croissant de x => permet de gagner du temps dans le parcours des points (pas besoin de parcourir tous les triangles pour chaque point)
+        # Tri des points par ordre croissant de x => permet de gagner du temps
+        # dans le parcours des points (pas besoin de parcourir tous les triangles pour chaque point)
         points = sorted(pset.points, key=lambda p: p.x)
         
         n = len(points)
@@ -118,7 +125,8 @@ class Triangulator:
         mid_x = (min_x + max_x) / 2
         mid_y = (min_y + max_y) / 2
         
-        # points du super triangle => 20 = augmentation superficielle pour assurer que le super triangle englobe tous les points
+        # points du super triangle => 20 = augmentation superficielle pour assurer que
+        # le super triangle englobe tous les points
         st_p1 = Point(mid_x - 20 * delta_max, mid_y - delta_max)
         st_p2 = Point(mid_x + 20 * delta_max, mid_y - delta_max)
         st_p3 = Point(mid_x, mid_y + 20 * delta_max)
@@ -171,7 +179,9 @@ class Triangulator:
         for t in bad_triangles:
             for edge in [(t.a, t.b), (t.b, t.c), (t.c, t.a)]:
                 sorted_edge = tuple(sorted(edge))
-                # On compte le nombre d'occurences de chaque arete (arrete comptée 2 fois si elle est partagée par 2 triangles / arrete comptée 1 fois si elle est frontière)
+                # On compte le nombre d'occurences de chaque arete
+                # (arrete comptée 2 fois si elle est partagée par 2 triangles /
+                # arrete comptée 1 fois si elle est frontière)
                 edge_counts[sorted_edge] = edge_counts.get(sorted_edge, 0) + 1
         
         polygon = [edge for edge, count in edge_counts.items() if count == 1]
@@ -192,7 +202,7 @@ class Triangulator:
                  continue
 
     def get_circumcircle(self, p1: Point, p2: Point, p3: Point):
-        """Returns ((center_x, center_y), radius_sq)"""
+        """Return ((center_x, center_y), radius_sq)."""
         # https://en.wikipedia.org/wiki/Circumcircle pour la formule
         ax, ay = p1.x, p1.y
         bx, by = p2.x, p2.y
@@ -212,4 +222,9 @@ class Triangulator:
         return (ux, uy), r_sq
 
     def triangle_area(self, p1, p2, p3):
-        return 0.5 * abs(p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y))
+        """Calculate the area of the triangle formed by p1, p2, p3."""
+        return 0.5 * abs(
+            p1.x * (p2.y - p3.y) +
+            p2.x * (p3.y - p1.y) +
+            p3.x * (p1.y - p2.y)
+        )
