@@ -8,12 +8,12 @@ perf_test:
 	python -m pytest -m "performance"
 
 coverage:
-	- coverage run -m pytest -m "not performance"
-	coverage report
-	coverage html
+	- python -m coverage run -m pytest -m "not performance"
+	python -m coverage report
+	python -m coverage html
 
 lint:
-	ruff check . --fix
+	python -m ruff check . --fix
 
 doc:
-	pdoc3 --html --output-dir docs . --force
+	python -m pdoc --html --output-dir docs . --force
