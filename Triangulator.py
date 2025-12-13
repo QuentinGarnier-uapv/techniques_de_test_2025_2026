@@ -1,9 +1,10 @@
-import urllib.request
 import urllib.error
-from models.PointSet import PointSet
+import urllib.request
+
 from models.Point import Point
-from models.Triangles import Triangles
+from models.PointSet import PointSet
 from models.Triangle import Triangle
+from models.Triangles import Triangles
 
 
 class Triangulator:
@@ -52,6 +53,35 @@ class Triangulator:
         if n < 3:
             return Triangles(points, [])
         
+        self._check_collinearity(points)
+        
+        all_points, active_triangles = self._create_super_triangle(points)
+        final_triangles = []
+        
+        for i, point in enumerate(points):
+            bad_triangles, new_active_triangles, finished_triangles = self._find_bad_triangles(point, active_triangles)
+            
+            # Les triangles "finis" ne seront plus jamais affectés, on les stocke
+            final_triangles.extend(finished_triangles)
+            active_triangles = new_active_triangles
+            
+            polygon = self._find_hole_boundary(bad_triangles)
+            
+            self._fill_hole(polygon, i, all_points, active_triangles)
+        
+        # Ajoute les triangles restants a final
+        for item in active_triangles:
+             final_triangles.append(item[0])
+                
+        # Supprime les triangles connectés au super-triangle
+        result_triangles = []
+        for t in final_triangles:
+            if t.a < n and t.b < n and t.c < n:
+                result_triangles.append(t)
+                
+        return Triangles(points, result_triangles)
+
+    def _check_collinearity(self, points):
         # Super-triangle
         min_x = points[0].x
         max_x = points[-1].x
@@ -75,6 +105,12 @@ class Triangulator:
         elif is_collinear:
              raise ValueError("Collinear points")
 
+    def _create_super_triangle(self, points):
+        min_x = points[0].x
+        max_x = points[-1].x
+        min_y = min(p.y for p in points)
+        max_y = max(p.y for p in points)
+
         dx = max_x - min_x
         # On definit le rectangle qui englobe tous les points
         dy = max_y - min_y
@@ -91,76 +127,69 @@ class Triangulator:
         all_points = points + [st_p1, st_p2, st_p3]
         
         # calcul du triangle super et de son cercle circonscrit
+        n = len(points)
         t0 = Triangle(n, n+1, n+2)
         c0, r0_sq = self.get_circumcircle(st_p1, st_p2, st_p3)
         
         # liste des triangles actifs (triangle, centre_x, centre_y, rayon au carré)
         active_triangles = [(t0, c0[0], c0[1], r0_sq)]
-        final_triangles = []
         
-        for i, point in enumerate(points):
-            bad_triangles = []
-            new_active_triangles = []
-            
-            px, py = point.x, point.y
-            
-            for item in active_triangles:
-                t, cx, cy, r_sq = item
-                
-                dx_dist = px - cx
-                # Si le carré de la distance sur x est supérieur au rayon au carré
-                # ET que le point est à droite du centre (dx_dist > 0),
-                # alors on est sûr qu'aucun point futur ne tombera dans ce cercle.
-                if dx_dist > 0 and (dx_dist**2) > r_sq:
-                    final_triangles.append(t)
-                    continue
-                
-                # Si le point est dans le cercle, ce triangle sera 'mauvais'
-                dist_sq = (cx - px)**2 + (cy - py)**2
-                if dist_sq < r_sq:
-                    bad_triangles.append(t)
-                else:
-                    new_active_triangles.append(item)
-            
-            active_triangles = new_active_triangles
-            
-            # polygon = frontiére du polygone formé par bad_triangles
-            polygon = []
-            # Trouve la frontière du polygone formé par bad_triangles
-            # Utilise un dictionnaire pour compter les arêtes: (min, max) -> count
-            edge_counts = {}
-            for t in bad_triangles:
-                for edge in [(t.a, t.b), (t.b, t.c), (t.c, t.a)]:
-                    sorted_edge = tuple(sorted(edge))
-                    # On compte le nombre d'occurences de chaque arete (arrete comptée 2 fois si elle est partagée par 2 triangles / arrete comptée 1 fois si elle est frontière)
-                    edge_counts[sorted_edge] = edge_counts.get(sorted_edge, 0) + 1
-            
-            polygon = [edge for edge, count in edge_counts.items() if count == 1]
-            
-            # Re-triangule le trou
-            for edge in polygon:
-                new_t = Triangle(edge[0], edge[1], i)
-                p1 = all_points[new_t.a]
-                p2 = all_points[new_t.b]
-                p3 = all_points[new_t.c]
-                
-                try:
-                    center, r_sq = self.get_circumcircle(p1, p2, p3)
-                    active_triangles.append((new_t, center[0], center[1], r_sq))
-                except ValueError:
-                     continue
+        return all_points, active_triangles
+
+    def _find_bad_triangles(self, point, active_triangles):
+        bad_triangles = []
+        new_active_triangles = []
+        finished_triangles = []
         
-        # Ajoute les triangles restants a final
+        px, py = point.x, point.y
+        
         for item in active_triangles:
-             final_triangles.append(item[0])
+            t, cx, cy, r_sq = item
+            
+            dx_dist = px - cx
+            # Si le carré de la distance sur x est supérieur au rayon au carré
+            # ET que le point est à droite du centre (dx_dist > 0),
+            # alors on est sûr qu'aucun point futur ne tombera dans ce cercle.
+            if dx_dist > 0 and (dx_dist**2) > r_sq:
+                finished_triangles.append(t)
+                continue
+            
+            # Si le point est dans le cercle, ce triangle sera 'mauvais'
+            dist_sq = (cx - px)**2 + (cy - py)**2
+            if dist_sq < r_sq:
+                bad_triangles.append(t)
+            else:
+                new_active_triangles.append(item)
                 
-        # Supprime les triangles connectés au super-triangle
-        result_triangles = []
-        for t in final_triangles:
-            if t.a < n and t.b < n and t.c < n:
-                result_triangles.append(t)
-                
-        return Triangles(points, result_triangles)
+        return bad_triangles, new_active_triangles, finished_triangles
+
+    def _find_hole_boundary(self, bad_triangles):
+        # polygon = frontiére du polygone formé par bad_triangles
+        # Trouve la frontière du polygone formé par bad_triangles
+        # Utilise un dictionnaire pour compter les arêtes: (min, max) -> count
+        edge_counts = {}
+        for t in bad_triangles:
+            for edge in [(t.a, t.b), (t.b, t.c), (t.c, t.a)]:
+                sorted_edge = tuple(sorted(edge))
+                # On compte le nombre d'occurences de chaque arete (arrete comptée 2 fois si elle est partagée par 2 triangles / arrete comptée 1 fois si elle est frontière)
+                edge_counts[sorted_edge] = edge_counts.get(sorted_edge, 0) + 1
+        
+        polygon = [edge for edge, count in edge_counts.items() if count == 1]
+        return polygon
+
+    def _fill_hole(self, polygon, point_index, all_points, active_triangles):
+        # Re-triangule le trou
+        for edge in polygon:
+            new_t = Triangle(edge[0], edge[1], point_index)
+            p1 = all_points[new_t.a]
+            p2 = all_points[new_t.b]
+            p3 = all_points[new_t.c]
+            
+            try:
+                center, r_sq = self.get_circumcircle(p1, p2, p3)
+                active_triangles.append((new_t, center[0], center[1], r_sq))
+            except ValueError:
+                 continue
 
     def get_circumcircle(self, p1: Point, p2: Point, p3: Point):
         """Returns ((center_x, center_y), radius_sq)"""
