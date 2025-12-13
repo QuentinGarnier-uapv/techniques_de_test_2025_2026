@@ -75,8 +75,8 @@ def test_colinear_points_no_triangles():
     """
     points = [Point(0, 0), Point(1, 1), Point(2, 2)]
     pset = PointSet(points)
-    result = tri.compute(pset)
-    assert len(result.triangles) == 0
+    with pytest.raises(ValueError, match="Collinear points"):
+        tri.compute(pset)
 
 def test_triangle_indices_within_pointset_range():
     """For any produced triangle, all vertex indices must be within [0, len(points)-1].
@@ -98,3 +98,15 @@ def test_invalid_input_type_raises():
     """
     with pytest.raises((AttributeError, TypeError)):
         tri.compute(None)
+
+def test_all_collinear_points_raises_error():
+    """If all points are collinear, the triangulator should raise an error 
+    indicating that triangulation is impossible (or at least fail explicitly),
+    rather than returning an empty set or a partial result.
+    """
+    points = [Point(0, 0), Point(1, 1), Point(2, 2), Point(10, 10)]
+    pset = PointSet(points)
+    
+    # We expect a ValueError (or similar) when the input is invalid for triangulation
+    with pytest.raises(ValueError, match="Collinear points"):
+        tri.compute(pset)
