@@ -1,3 +1,4 @@
+"""Flask application for Triangulator service."""
 from flask import Flask, Response, jsonify
 
 from Triangulator import Triangulator
@@ -9,6 +10,7 @@ tri = Triangulator()
 
 @app.route("/triangulation/<pointSetId>", methods=["GET"])
 def get_triangulation(pointSetId: str):
+    """Handle triangulation request."""
     try:
         result = tri.triangulate(pointSetId)
 
