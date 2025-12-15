@@ -43,3 +43,5 @@ TOTAL                   252     13    95%
 
 
 Actuellement, dans le Triangulator je suis a 93% de coverage mais je ne sais pas comment augmenter le pourcentage ni dans le model Triangle et dans l'app. Cependant un coverage de 95% est déjà assez bon.
+
+Enfin pour terminer correctement le projet il ne manquait plus qu'une CI qui lancait automatiquement les tests, le linter et le coverage, ce que j'ai créé avec le fichier ci.yml sur l'image classique ubuntu-latest.
