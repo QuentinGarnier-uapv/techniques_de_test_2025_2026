@@ -1,4 +1,6 @@
 import pytest
+import urllib.error
+
 
 from triangulator_app import app, tri
 
@@ -42,7 +44,7 @@ def test_invalid_uuid_returns_400(client, monkeypatch):
     """Teste que la route retourne un code 400 pour un UUID invalide.
     """
     def fake_triangulate(pointSetId):
-        raise Exception("incorrect uuid format")
+        raise ValueError("incorrect uuid format")
 
     monkeypatch.setattr(tri, "triangulate", fake_triangulate)
     response = client.get("/triangulation/mauvais-uuid")
@@ -54,7 +56,7 @@ def test_pointset_not_found_returns_404(client, monkeypatch):
     """Teste que la route retourne un code 404 lorsque le point set n'est pas trouvé.
     """
     def fake_triangulate(pointSetId):
-        raise Exception("Point set not found")
+        raise urllib.error.HTTPError("url", 404, "Not Found", {}, None)
 
     monkeypatch.setattr(tri, "triangulate", fake_triangulate)
     response = client.get("/triangulation/00000000-0000-0000-0000-000000000000")
@@ -79,7 +81,7 @@ def test_pointset_manager_unavailable_returns_503(client, monkeypatch):
     """Teste que la route retourne un code 503 lorsque le gestionnaire de point sets est indisponible.
     """
     def fake_triangulate(pointSetId):
-        raise Exception("point set manager unavailable")
+        raise urllib.error.HTTPError("url", 503, "Unavailable", {}, None)
     monkeypatch.setattr(tri, "triangulate", fake_triangulate)
     response = client.get("/triangulation/00000000-0000-0000-0000-000000000000")
     assert response.status_code == 503

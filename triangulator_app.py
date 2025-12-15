@@ -1,5 +1,7 @@
 """Flask application for Triangulator service."""
 from flask import Flask, Response, jsonify
+import urllib.error
+
 
 from Triangulator import Triangulator
 
@@ -16,22 +18,37 @@ def get_triangulation(pointSetId: str):
 
         return Response(result, mimetype='application/octet-stream', status=200)
 
-    except Exception as e:
-        error_msg = str(e)
+    except ValueError as e:
+        # Invalid UUID or data format
+        return jsonify({
+             "code": "TRIANGULATION_FAILED",
+             "message": "Triangulation could not be computed for the given point set."
+        }), 400
+
+    except urllib.error.HTTPError as e:
         status_code = 500
-
-        if "incorrect uuid format" in error_msg:
-            status_code = 400
-        elif "Point set not found" in error_msg:
+        if e.code == 404:
             status_code = 404
-        elif "point set manager unavailable" in error_msg:
+        elif e.code == 503:
             status_code = 503
-
-        response_body = {
+        
+        return jsonify({
             "code": "TRIANGULATION_FAILED",
             "message": "Triangulation could not be computed for the given point set."
-        }
-        return jsonify(response_body), status_code
+        }), status_code
+
+    except urllib.error.URLError as e:
+        # Connection failed
+        return jsonify({
+            "code": "TRIANGULATION_FAILED",
+            "message": "Triangulation could not be computed for the given point set."
+        }), 503
+
+    except Exception as e:
+        return jsonify({
+            "code": "TRIANGULATION_FAILED",
+            "message": "Triangulation could not be computed for the given point set."
+        }), 500
 
 
 if __name__ == "__main__":

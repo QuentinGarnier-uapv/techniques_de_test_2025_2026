@@ -28,24 +28,13 @@ class Triangulator:
         """Get point set from manager by ID."""
         # Basic UUID validation (length and hex) - simplified
         if len(pointSetId) != 36:
-             raise Exception("incorrect uuid format")
+             raise ValueError("incorrect uuid format")
         
         url = f"{self.manager_url}/pointset/{pointSetId}"
-        try:
-            with urllib.request.urlopen(url) as response:
-                data = response.read()
-                return PointSet.from_bytes(data)
-        except urllib.error.HTTPError as e:
-            if e.code == 404:
-                raise Exception("Point set not found") from e
-            elif e.code == 503:
-                raise Exception("point set manager unavailable") from e
-            else:
-                raise Exception(f"HTTP Error {e.code}") from e
-        except urllib.error.URLError as e:
-            raise Exception("point set manager unavailable") from e
-        except Exception:
-            raise
+        with urllib.request.urlopen(url) as response:
+            data = response.read()
+            return PointSet.from_bytes(data)
+
 
     def compute(self, pset: PointSet) -> Triangles:
         """Algorithme de triangulation de Bowyer-Watson.
@@ -105,7 +94,7 @@ class Triangulator:
                 is_collinear = False
                 break
         
-        # si les extremités sont les memes points alors on a une droite car tout les points sont tres proches 
+        # si les extremités sont les memes points alors on a une droite car tout les points sont tres proches
         if abs(max_x - min_x) < 1e-9 and abs(max_y - min_y) < 1e-9:
              is_collinear = True
              pass
