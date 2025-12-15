@@ -1,4 +1,6 @@
 import math
+import pytest
+import struct
 
 from models.Point import Point
 from models.PointSet import PointSet
@@ -74,3 +76,60 @@ def test_triangles_empty_bytes():
     assert T2.points == []
     assert T2.triangles == []
 
+
+def test_point_from_bytes_invalid():
+    """Test Point.from_bytes with invalid data raises ValueError."""
+    with pytest.raises(ValueError, match="Invalid byte sequence for Point"):
+        Point.from_bytes(b"\x00\x00\x00")
+
+
+def test_point_to_tuple():
+    """Test Point.to_tuple."""
+    p = Point(1.0, 2.0)
+    assert p.to_tuple() == (1.0, 2.0)
+
+
+def test_pointset_from_bytes_too_short():
+    """Test PointSet.from_bytes with data too short for header."""
+    with pytest.raises(ValueError, match="Data too short"):
+        PointSet.from_bytes(b"\x00\x00")
+
+
+def test_pointset_from_bytes_points_truncated():
+    """Test PointSet.from_bytes with correct count but missing point data."""
+    data = struct.pack("<I", 1)
+    with pytest.raises(ValueError, match="Data too short for points"):
+        PointSet.from_bytes(data)
+
+
+def test_triangle_from_bytes_invalid_len():
+    """Test Triangle.from_bytes with data too short."""
+    with pytest.raises(ValueError, match="Invalid byte sequence for Triangle"):
+        Triangle.from_bytes(b"\x00" * 11)
+
+
+def test_triangles_from_bytes_too_short_header():
+    """Test Triangles.from_bytes with data too short for PointSet count."""
+    with pytest.raises(ValueError, match="Data too short"):
+        Triangles.from_bytes(b"\x00")
+
+
+def test_triangles_from_bytes_too_short_pointset():
+    """Test Triangles.from_bytes when PointSet data is truncated."""
+    data = struct.pack("<I", 1) 
+    with pytest.raises(ValueError, match="Data too short for PointSet"):
+        Triangles.from_bytes(data)
+
+
+def test_triangles_from_bytes_too_short_triangle_count():
+    """Test Triangles.from_bytes when missing triangle count header."""
+    data = struct.pack("<I", 0)
+    with pytest.raises(ValueError, match="Data too short for Triangle count"):
+        Triangles.from_bytes(data)
+
+
+def test_triangles_from_bytes_too_short_triangles_data():
+    """Test Triangles.from_bytes when triangle data is truncated."""
+    data = struct.pack("<II", 0, 1)
+    with pytest.raises(ValueError, match="Data too short for expected triangles"):
+        Triangles.from_bytes(data)
