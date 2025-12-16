@@ -9,7 +9,7 @@
   - `test_all_collinear` : Quand tous les points sont alignés => aucun triangle n'est formable, donc un `raise` doit être effectué.
 - **Linter** : J'ai simplement corrigé les erreurs données en exécutant le `make lint` (beaucoup de docstrings manquantes, lignes trop longues, etc.) => voir `lint_report.txt`.
 - **Coverage** : Diminution du pourcentage de coverage due aux cas non prévus lors de l'implémentation des tests (coverage initial d'environ 80%).
-  - *Test triangulator en fonction des réponses de l'API* : Ayant déjà implémenté les tests API, cela m'était totalement sorti de la tête qu'il aurait fallu tester la réaction de mon code en fonction des réponses de l'API. Ainsi j'ai ajouté des tests qui mockent les réponses de l'API et testent la réaction de mon code.
+  - *Test triangulator en fonction des réponses de l'API* : Ayant déjà implémenté les tests API, cela m'était totalement sorti de la tête qu'il aurait fallu tester la réaction de mon code en fonction des réponses de l'API. Ainsi j'ai ajouté des tests qui mockent les réponses de l'API et testent la réaction de mon code. Point important a souligner : ces tests ont été ajoutés dans "test_integration_triangulator.py", se raprochant plus de l'intégration API que des tests unitaires.
   - *Cas trop spécifique pour y penser* : Dans le triangulator, je n'avais pas imaginé le cas des points colinéaires trop proches. En effet, quand on calcule la surface d'un potentiel triangle pour tester la colinéarité, si on attend que la surface soit > 0 on peut se retrouver dans des situations bizarres où on a des valeurs extrêmement proches de 0 qui sont considérées comme égales à 0. Ainsi j'ai dû rajouter un test pour ce cas.
   - *Simple oubli d'inattention* : Dans les tests des models, j'ai, sûrement par manque de temps et de concentration, oublié de tester le `to_tuple` du Point. De plus je n'ai pas prévu de cas d'erreur levée dans le cas de données invalides rentrées (ex: `from_bytes` avec des données trop petites).
 
@@ -49,3 +49,7 @@ Actuellement, dans le `Triangulator` je suis à 93% de coverage mais je ne sais 
 Enfin, pour terminer correctement le projet il ne manquait plus qu'une CI qui lançait automatiquement les tests, le linter et le coverage, ce que j'ai créé avec le fichier `ci.yml` sur l'image classique `ubuntu-latest`. Cette derniére étape n'était pas citée dans le plan initial mais cela m'a semblé plus qu'indispensable pour terminer correctement le projet.
 
 Je tien a enfin vous remercier pour ce sujet qui est fort original et qui nous force rééllement a nous concentrer sur la stratégie de test plutôt que sur l'implémentation réelle. 
+
+cas déf auparavant
+
+verif cas n-2 => avec le cas du sujet.
