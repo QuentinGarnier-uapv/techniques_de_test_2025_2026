@@ -4,6 +4,8 @@ from models.Point import Point
 from models.PointSet import PointSet
 from models.Triangles import Triangles
 from Triangulator import Triangulator
+import json
+from pathlib import Path
 
 
 
@@ -118,3 +120,19 @@ def test_check_collinearity_epsilon():
     
     with pytest.raises(ValueError, match="Collinear points"):
         tri.compute(pset)
+
+def test_specific_cases_from_json():
+    """Test triangulation using specific cases from a JSON file.
+    
+    This ensures that known geometric configurations produce the expected
+    number of triangles.
+    """
+    data_path = Path(__file__).parent / "data" / "test_cases.json"
+    with open(data_path, "r", encoding="utf-8") as f:
+        cases = json.load(f)
+    
+    for case in cases:
+        points = [Point(p[0], p[1]) for p in case["points"]]
+        pset = PointSet(points)
+        result = tri.compute(pset)
+        assert len(result.triangles) == case["expected_triangles_count"], f"Failed for case {case['name']}"
